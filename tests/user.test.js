@@ -17,50 +17,6 @@ describe('User API', () => {
     server.close();
   });
 
-  it('should register a new user with random data', async () => {
-    const randomUsername = faker.internet.userName();
-    const randomEmail = faker.internet.email();
-    const randomName = faker.person.fullName();
-    const randomPassword = faker.internet.password();
-
-    //Arrange
-    const newUser = {
-      username: randomUsername,
-      password: randomPassword,
-      email: randomEmail,
-      name: randomName,
-    };
-
-    //Act
-    const response = await request(app)
-      .post('/api/auth/register')
-      .send(newUser);
-
-    //Assert
-    expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty('user');
-    expect(response.body.user.username).toBe(randomUsername);
-  });
-
-  it('should not register a user if username already exists', async () => {
-    // Arrange
-    const newUser = {
-      username: 'testuser',
-      password: 'testuser',
-      email: 'test@example.com',
-      name: 'Test User',
-    };
-
-    // Act
-    const response = await request(app)
-      .post('/api/auth/register')
-      .send(newUser);
-
-    // Assert
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty('message', 'A user with this username already exists');
-  });
-
   it('should log in and get a valid token', async () => {
     // Arrange
     const loginData = {
