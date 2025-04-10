@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'Built_InNode'
-    }
-
     environment {
         APP_NAME = 'Electiva3'
         BUILD_DIR = 'build'
