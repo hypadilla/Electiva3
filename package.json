@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage --runInBand",
-    "dev": "node --watch index.js"
+    "dev": "node index.js"
   },
   "keywords": [],
   "author": "",
