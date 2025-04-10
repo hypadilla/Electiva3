@@ -4,8 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-
-    
     "test": "jest --coverage --runInBand",
     "dev": "node --watch index.js"
   },
