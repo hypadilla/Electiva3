@@ -8,6 +8,7 @@ pipeline {
     environment {
         APP_NAME = 'Electiva3'
         BUILD_DIR = 'build'
+        PATH = "/opt/homebrew/bin:$PATH"
     }
 
     options {
