@@ -23,7 +23,7 @@ pipeline {
         stage('Instalación de dependencias') {
             steps {
                 echo 'Instalando dependencias...'
-                sh 'npm install'
+                sh 'npm install --registry=https://registry.npmjs.org/'
             }
         }
 
