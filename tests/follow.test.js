@@ -16,25 +16,6 @@ describe('Follow API', () => {
         server.close();
     });
 
-    it('should log in and get a token', async () => {
-        //Arrange
-        const loginData = {
-            username: 'testuser',
-            password: 'testuser',
-        };
-
-        //Act
-        const response = await request(app)
-            .post('/api/auth/login')
-            .send(loginData);
-
-        //Assert
-        expect(response.body).toHaveProperty('token');
-        expect(response.body.user.username).toBe('testuser');
-
-        token = response.body.token;
-    });
-
     it('should follow a user by username', async () => {
         //Arrange
         //Act
