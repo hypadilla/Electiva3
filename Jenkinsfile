@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18'
-        }
-    }
+    agent any
 
     environment {
         APP_NAME = 'Electiva3'
@@ -21,6 +17,13 @@ pipeline {
             steps {
                 echo 'Clonando el repositorio...'
                 checkout scm
+            }
+        }
+
+        stage('Verificar npm') {
+            steps {
+                sh 'which npm || echo "npm no está en el PATH"'
+                sh 'node -v || echo "Node.js no está instalado"'
             }
         }
 
