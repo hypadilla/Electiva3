@@ -96,7 +96,7 @@ pipeline {
             echo 'Pipeline ejecutado con éxito ✅'
         }
         failure {
-            echo 'Pipeline falló ❌'
+            echo 'Pipeline falló  ❌'
         }
     }
 }
