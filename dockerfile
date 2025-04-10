@@ -1,5 +1,5 @@
 FROM node:20
-COPY . .
-RUN npm install
 
+RUN npm install
+COPY . .
 CMD ["npm", "run", "dev"]
