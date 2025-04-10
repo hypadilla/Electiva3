@@ -50,41 +50,10 @@ pipeline {
                 echo 'Compilando la aplicación...'
                 sh 'colima stop'
                 sh 'colima start'
-                sh 'docker '
+                sh 'docker build -t clonex .'
+                sh 'docker run --rm -it clonex'
             }
         }
-
-        /*stage('Análisis de Código (SonarQube)') {
-            steps {
-                echo 'Ejecutando análisis estático con SonarQube...'
-                // Cambia los parámetros según tu configuración
-                withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner -Dsonar.projectKey=MiApp -Dsonar.sources=src'
-                }
-            }
-        }
-
-        stage('Esperar análisis (opcional)') {
-            steps {
-                waitForQualityGate abortPipeline: true
-            }
-        }*/
-
-        stage('Empaquetado') {
-            steps {
-                echo 'Empaquetando artefacto...'
-                sh 'zip -r ${APP_NAME}.zip ${BUILD_DIR}' // o `dotnet publish`
-            }
-        }
-
-        stage('Deploy a ambiente de prueba') {
-            steps {
-                echo 'Desplegando a entorno de pruebas...'
-                // Comando para copiar archivos, usar scripts de despliegue, etc.
-                sh './scripts/deploy.sh'
-            }
-        }
-
     }
 
     post {
