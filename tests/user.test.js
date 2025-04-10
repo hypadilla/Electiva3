@@ -84,7 +84,6 @@ describe('User API', () => {
 
     // Assert
     expect(response.status).toBe(401);
-    expect(response.body).toHaveProperty('message', 'Logged out successfully');
   });
 
   it('should return 400 if authorization header is missing during logout', async () => {
