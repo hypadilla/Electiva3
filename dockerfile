@@ -1,4 +1,4 @@
-FROM node:23
+FROM node:23.11.0
 COPY . .
 RUN npm install
 
