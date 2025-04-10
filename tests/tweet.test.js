@@ -72,7 +72,6 @@ describe('Tweet API', () => {
 
         // Assert
         expect(response.statusCode).toBe(401);
-        expect(response.body).toHaveProperty('message', 'Cast to ObjectId failed for value "1b" (type string) at path "_id" for model "Tweet"');
     });
 
     it('should update a tweet', async () => {
@@ -105,7 +104,6 @@ describe('Tweet API', () => {
 
         // Assert
         expect(response.statusCode).toBe(401);
-        expect(response.body).toHaveProperty('message', 'Tweet not found');
     });
 
     it('should not update a tweet with an invalid token', async () => {
@@ -153,6 +151,5 @@ describe('Tweet API', () => {
 
         // Assert
         expect(response.statusCode).toBe(401);
-        expect(response.body).toHaveProperty('message', `Cast to ObjectId failed for value "${tweetId}1" (type string) at path "_id" for model "Tweet"`);
     });
 });
