@@ -51,7 +51,7 @@ pipeline {
                 sh 'colima stop'
                 sh 'colima start'
                 sh 'docker build -t clonex .'
-                sh 'docker run --rm clonex'
+                sh 'docker run --rm -p 3015:3015 clonex'
             }
         }
     }
