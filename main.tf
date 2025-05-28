@@ -10,10 +10,8 @@ terraform {
 # Proveedor AWS
 provider "aws" {
   region = var.aws_region
-  # NOTA: Para producción, usa variables de entorno o el archivo ~/.aws/credentials
-  # en lugar de hardcodear las credenciales
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
+  # Las credenciales se obtienen de variables de entorno o del archivo ~/.aws/credentials
+  # NO incluir credenciales directamente en el código
 }
 
 # Recurso AWS - VPC

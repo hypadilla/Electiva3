@@ -7,16 +7,16 @@ variable "aws_region" {
 }
 
 variable "aws_access_key" {
-  description = "Clave de acceso de AWS (para desarrollo, en producción usar variables de entorno)"
+  description = "Clave de acceso de AWS (configurar mediante variables de entorno AWS_ACCESS_KEY_ID)"
   type        = string
-  default     = "AKIA5BZGUA6YIFYLPWOJ"
+  default     = null # No incluir valores por defecto para credenciales
   sensitive   = true
 }
 
 variable "aws_secret_key" {
-  description = "Clave secreta de AWS (para desarrollo, en producción usar variables de entorno)"
+  description = "Clave secreta de AWS (configurar mediante variables de entorno AWS_SECRET_ACCESS_KEY)"
   type        = string
-  default     = "s4GiQX6X/ogKPwY9kooGuxZJD7USQD7hUYbabtEV"
+  default     = null # No incluir valores por defecto para credenciales
   sensitive   = true
 }
 
