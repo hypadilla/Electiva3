@@ -1,11 +1,10 @@
-# Terraform - Ignorar todos los archivos relacionados con Terraform
+# Terraform
 .terraform/
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
 terraform.tfstate.*.backup
 .terragrunt-cache/
-*.tfvars
 *.tfvars.json
 override.tf
 override.tf.json
@@ -13,70 +12,65 @@ override.tf.json
 *_override.tf.json
 crash.log
 crash.*.log
-*.tf
 
 # Archivos generados por Terraform
 deployment_info.txt
 local_ip.txt
 docker-host.auto.tfvars
 
-# Scripts de configuración
-setup-docker.sh
-setup-docker.bat
-
 # Archivos de credenciales y claves
 *.pem
 *.key
-.env*
+.env
+.env.*
 credentials.json
 .aws/
 
-# Control de versiones
-.git/
-.gitignore
-.github/
+# Archivos de Docker
+.docker/
+docker-compose.override.yml
 
 # Archivos de sistema
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
-*.sublime-*
+*.sublime-project
+*.sublime-workspace
 *.swp
 *.swo
 
 # Dependencias y paquetes
 node_modules/
 vendor/
-package-lock.json
-yarn.lock
 
 # Logs y archivos temporales
 logs/
 *.log
-tmp/
-temp/
 .tmp/
 .temp/
-
-# Archivos de prueba
-test/
-tests/
-spec/
-coverage/
-.nyc_output/
-
-# Documentación
-docs/
-README.md
-CHANGELOG.md
-LICENSE
-
-# Archivos de Docker (excepto el Dockerfile principal)
-.dockerignore
-docker-compose*.yml
+tmp/
+temp/
 
 # Archivos de construcción
 dist/
 build/
 out/
+
+# Archivos de prueba
+test-results/
+coverage/
+.nyc_output/
+
+# Otros
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+nbproject
+*.launch
+*.iml
+*.ipr
+*.iws
+.classpath
