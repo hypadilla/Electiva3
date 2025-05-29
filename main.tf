@@ -9,9 +9,11 @@ terraform {
 
 # Proveedor AWS
 provider "aws" {
-  region = var.aws_region
-  # Las credenciales se obtienen de variables de entorno o del archivo ~/.aws/credentials
-  # NO incluir credenciales directamente en el código
+  region     = var.aws_region
+  # NOTA: Esta configuración es temporal para pruebas
+  # En un entorno de producción, usa variables de entorno o ~/.aws/credentials
+  access_key = "AKIA5BZGUA6YIFYLPWOJ"
+  secret_key = "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"
 }
 
 # Recurso AWS - VPC
@@ -118,47 +120,20 @@ resource "aws_security_group" "app" {
   }
 }
 
-# Recurso AWS - instancia EC2
-resource "aws_instance" "ubuntu_ec2" {
-  ami                    = var.ami_id
-  instance_type          = var.instance_type
-  subnet_id              = aws_subnet.public.id
-  vpc_security_group_ids = [aws_security_group.app.id]
-  key_name               = var.key_name
+# Recurso AWS - instancia EC2 (referencia a instancia existente)
+data "aws_instance" "ubuntu_ec2" {
+  instance_id = "i-05f023259fb4cc983" # ID de la instancia existente
+}
 
-  root_block_device {
-    volume_size = 20
-    volume_type = "gp3"
-    encrypted   = true
-  }
-
-  tags = {
-    Name        = "${var.app_name}-instance"
-    Environment = var.environment
-  }
-
-  # Script de inicialización
-  user_data = <<-EOF
-              #!/bin/bash
-              apt-get update
-              apt-get install -y docker.io
-              systemctl start docker
-              systemctl enable docker
-              usermod -aG docker ubuntu
-              
-              # Crear directorio para la aplicación
-              mkdir -p /app
-              
-              # Crear un archivo de registro para la IP
-              echo "Instancia creada con éxito" > /app/deployment.log
-              echo "IP pública: $(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)" >> /app/deployment.log
-              
-              # Ejecutar un contenedor de prueba
-              docker run -d -p 80:80 --name nginx nginx:latest
-              EOF
-
-  # Ejecutar un comando local después de crear la instancia
-  provisioner "local-exec" {
-    command = "echo 'Instancia EC2 creada con IP: ${self.public_ip}' >> deployment_info.txt"
+# Output para mostrar información de la instancia existente
+output "existing_instance_info" {
+  description = "Información de la instancia EC2 existente"
+  value = {
+    id         = data.aws_instance.ubuntu_ec2.id
+    public_ip  = data.aws_instance.ubuntu_ec2.public_ip
+    public_dns = data.aws_instance.ubuntu_ec2.public_dns
+    state      = data.aws_instance.ubuntu_ec2.instance_state
+    type       = data.aws_instance.ubuntu_ec2.instance_type
+    ami        = data.aws_instance.ubuntu_ec2.ami
   }
 }

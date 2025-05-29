@@ -19,6 +19,8 @@ local_ip.txt
 docker-host.auto.tfvars
 setup-aws.sh
 aws-credentials-example.txt
+connect-ec2.sh
+EC2-INFO.md
 
 # Archivos de credenciales y claves
 *.pem
