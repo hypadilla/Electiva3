@@ -97,3 +97,9 @@ variable "docker_container_port" {
   type        = number
   default     = 80
 }
+
+variable "app_port" {
+  description = "Puerto en el que se ejecutará la aplicación backend"
+  type        = number
+  default     = 3015
+}

@@ -4,6 +4,18 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.0"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.0"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.0"
+    }
   }
 }
 
@@ -136,4 +148,96 @@ output "existing_instance_info" {
     type       = data.aws_instance.ubuntu_ec2.instance_type
     ami        = data.aws_instance.ubuntu_ec2.ami
   }
+}
+
+# Recurso para crear un archivo de configuración local para el backend
+resource "local_file" "backend_env" {
+  content  = <<-EOT
+    PORT=${var.app_port}
+    NODE_ENV=${var.environment}
+  EOT
+  filename = "${path.module}/.env"
+}
+
+# Recurso para comprimir el código fuente del backend
+data "archive_file" "backend_code" {
+  type        = "zip"
+  source_dir  = path.module
+  output_path = "${path.module}/backend.zip"
+  excludes    = [
+    ".git", ".terraform", "terraform.tfstate", "terraform.tfstate.backup", 
+    "node_modules", ".DS_Store", "backend.zip"
+  ]
+  depends_on = [local_file.backend_env]
+}
+
+# Recurso para desplegar el backend en la instancia EC2
+resource "null_resource" "deploy_backend" {
+  # Trigger para forzar la ejecución en cada apply
+  triggers = {
+    always_run = timestamp()
+    code_hash  = data.archive_file.backend_code.output_base64sha256
+  }
+
+  # Copiar el archivo zip a la instancia EC2
+  provisioner "file" {
+    source      = data.archive_file.backend_code.output_path
+    destination = "/tmp/backend.zip"
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("${path.module}/${var.key_name}.pem")
+      host        = data.aws_instance.ubuntu_ec2.public_ip
+    }
+  }
+
+  # Ejecutar comandos en la instancia EC2 para desplegar el backend
+  provisioner "remote-exec" {
+    inline = [
+      "echo 'Instalando dependencias necesarias...'",
+      "sudo apt-get update",
+      "sudo apt-get install -y unzip",
+      
+      "echo 'Verificando si Docker está instalado...'",
+      "if ! command -v docker &> /dev/null; then",
+      "  echo 'Instalando Docker...'",
+      "  sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common",
+      "  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
+      "  sudo add-apt-repository -y \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
+      "  sudo apt-get update",
+      "  sudo apt-get install -y docker-ce docker-ce-cli containerd.io",
+      "  sudo usermod -aG docker ubuntu",
+      "  sudo systemctl enable docker",
+      "  sudo systemctl start docker",
+      "fi",
+      
+      "echo 'Deteniendo servicios existentes...'",
+      "sudo docker stop ${var.app_name}-container || true",
+      "sudo docker rm ${var.app_name}-container || true",
+      
+      "echo 'Preparando directorio de la aplicación...'",
+      "mkdir -p ~/${var.app_name}",
+      "rm -rf ~/${var.app_name}/*",
+      "unzip -o /tmp/backend.zip -d ~/${var.app_name}",
+      "cd ~/${var.app_name}",
+      
+      "echo 'Construyendo imagen Docker...'",
+      "sudo docker build -t ${var.app_name}:latest ~/${var.app_name}",
+      
+      "echo 'Iniciando contenedor Docker...'",
+      "sudo docker run -d --name ${var.app_name}-container -p ${var.app_port}:3015 -e PORT=${var.app_port} -e NODE_ENV=${var.environment} ${var.app_name}:latest",
+      
+      "echo 'Backend desplegado correctamente en http://${data.aws_instance.ubuntu_ec2.public_ip}:${var.app_port}'"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("${path.module}/${var.key_name}.pem")
+      host        = data.aws_instance.ubuntu_ec2.public_ip
+    }
+  }
+
+  depends_on = [data.archive_file.backend_code]
 }
