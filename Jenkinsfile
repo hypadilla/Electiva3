@@ -83,6 +83,32 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy con Terraform') {
+            environment {
+                AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
+                AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+                TF_VAR_key_name       = 'ElectivaIII'
+            }
+            steps {
+                echo 'Desplegando infraestructura con Terraform...'
+                script {
+                    if (isUnix()) {
+                        sh 'terraform --version'
+                        sh 'terraform init'
+                        sh 'terraform validate'
+                        sh 'terraform plan -out=tfplan'
+                        sh 'terraform apply -auto-approve tfplan'
+                    } else {
+                        bat 'terraform --version'
+                        bat 'terraform init'
+                        bat 'terraform validate'
+                        bat 'terraform plan -out=tfplan'
+                        bat 'terraform apply -auto-approve tfplan'
+                    }
+                }
+            }
+        }
     }
 
     post {
