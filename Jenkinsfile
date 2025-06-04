@@ -65,7 +65,7 @@ pipeline {
             }
         }
 
-        stage('Build container') {
+        /*stage('Build container') {
             steps {
                 echo 'Compilando la aplicación...'
                 script {
@@ -82,25 +82,62 @@ pipeline {
                     }
                 }
             }
+        }*/
+
+        stage('Instalar Terraform') {
+            steps {
+                echo 'Instalando Terraform...'
+                script {
+                    if (isUnix()) {
+                        // Instalación de Terraform en macOS/Linux
+                        sh '''
+                            if ! command -v terraform &> /dev/null; then
+                                echo "Terraform no está instalado. Instalando..."
+                                # Descargar Terraform
+                                curl -O https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_darwin_amd64.zip
+                                # Descomprimir
+                                unzip -o terraform_1.5.7_darwin_amd64.zip
+                                # Mover a un directorio en el PATH
+                                chmod +x terraform
+                                sudo mv terraform /usr/local/bin/
+                                # Limpiar
+                                rm -f terraform_1.5.7_darwin_amd64.zip
+                            else
+                                echo "Terraform ya está instalado"
+                                terraform --version
+                            fi
+                        '''
+                    } else {
+                        // Instalación de Terraform en Windows
+                        bat '''
+                            where terraform >nul 2>&1
+                            if %errorlevel% neq 0 (
+                                echo Terraform no esta instalado. Instalando...
+                                powershell -Command "Invoke-WebRequest -Uri https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_windows_amd64.zip -OutFile terraform.zip"
+                                powershell -Command "Expand-Archive -Path terraform.zip -DestinationPath C:\terraform -Force"
+                                powershell -Command "[Environment]::SetEnvironmentVariable('PATH', $env:PATH + ';C:\terraform', 'Machine')"
+                                set PATH=%PATH%;C:\terraform
+                                del terraform.zip
+                            ) else (
+                                echo Terraform ya esta instalado
+                                terraform --version
+                            )
+                        '''
+                    }
+                }
+            }
         }
 
         stage('Deploy con Terraform') {
-            environment {
-                AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
-                AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-                TF_VAR_key_name       = 'ElectivaIII'
-            }
             steps {
                 echo 'Desplegando infraestructura con Terraform...'
                 script {
                     if (isUnix()) {
-                        sh 'terraform --version'
                         sh 'terraform init'
                         sh 'terraform validate'
                         sh 'terraform plan -out=tfplan'
                         sh 'terraform apply -auto-approve tfplan'
                     } else {
-                        bat 'terraform --version'
                         bat 'terraform init'
                         bat 'terraform validate'
                         bat 'terraform plan -out=tfplan'
